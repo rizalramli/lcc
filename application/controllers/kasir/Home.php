@@ -28,19 +28,18 @@ class Home extends CI_Controller
         foreach ($this->cart->contents() as $item) {
 
             if ($id_stok_b == $item['id']) {
-                 $qty_kasir_sebelumnya = $item['qty'];
+                $qty_kasir_sebelumnya = $item['qty'];
             }
-            
         }
 
         $nama = $_POST["product_name"];
 
-        if ($qty_kasir_sebelumnya<$qty_db) {
+        if ($qty_kasir_sebelumnya < $qty_db) {
             $data = array(
-            "id" => $_POST["product_id"],
-            "name" => $_POST["product_name"],
-            "qty" => $_POST["quantity"],
-            "price" => $_POST["product_price"]
+                "id" => $_POST["product_id"],
+                "name" => $_POST["product_name"],
+                "qty" => $_POST["quantity"],
+                "price" => $_POST["product_price"]
             );
             $this->cart->insert($data); //return rowid
 
@@ -48,13 +47,10 @@ class Home extends CI_Controller
             echo $this->view();
         } else {
             echo "<script>
-            	alert('Stok ".$nama." kurang');
+            	alert('Stok " . $nama . " kurang');
             </script>";
-           echo $this->view();
+            echo $this->view();
         }
-        
-
-        
     }
     function delete_cart()
     {
@@ -74,7 +70,7 @@ class Home extends CI_Controller
             alert('Keranjang Anda Masih Kosong');
             window.location = '" . base_url('kasir') . "';
             </script>";
-        }  else {
+        } else {
             date_default_timezone_set("Asia/Jakarta");
             $tanggal = Date('Y-m-d H:i:s');
             $id_customer = $this->M_home->id_customer();
@@ -97,7 +93,7 @@ class Home extends CI_Controller
 
             $data_penjualan = array(
                 'id_penjualan' => $id_penjualan,
-                'id_user' => 'U01',
+                'id_user' => $this->session->userdata('id_user'),
                 'id_customer' => $id_customer,
                 'tanggal' => $tanggal,
                 'total' => $total,

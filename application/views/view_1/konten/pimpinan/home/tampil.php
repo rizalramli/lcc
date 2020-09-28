@@ -99,11 +99,11 @@
 			['Task', 'Hours per Day'],
 			['LCC Komputer', aset_lcc],
 			['CMC Komputer', aset_cmc],
-			['Paradox Komputer', aset_probolinggo],
+			['Probolinggo Komputer', aset_probolinggo],
 		]);
 
 		var options = {
-			title: 'Total Aset Semua Toko : ' + 'Rp ' + formatRupiah(total) + ',00'
+			title: 'Total Aset Semua Toko : ' + 'Rp ' + formatRupiah(total)
 
 		};
 
