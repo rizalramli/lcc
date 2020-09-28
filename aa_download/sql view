@@ -1,0 +1,59 @@
+query daftar_barang(kasir)
+CREATE VIEW barang_kasir AS SELECT id_stok_b,kode_unik,barang_terdaftar.nama AS nama_barang,tanggal,id_toko,hrg_distributor,qty,distributor.nama AS nama_distributor FROM stok_barang JOIN barang_terdaftar USING(kode) JOIN pemasokan USING(id_pemasokan) JOIN distributor USING(id_distributor) JOIN user USING(id_user) JOIN toko USING(id_toko)
+query stok barang
+SELECT nama,SUM(qty) AS stok,id_toko,nama_toko from stok_barang JOIN barang_terdaftar USING(kode) JOIN pemasokan USING(id_pemasokan) JOIN user USING(id_user) JOIN toko USING(id_toko) GROUP BY nama,id_toko
+query barang toko
+CREATE VIEW barang_toko AS SELECT kode,id_stok_b,SUM(qty) as stok,kode_unik,nama,barcode,id_toko,hrg_distributor FROM stok_barang JOIN barang_terdaftar USING(kode) JOIN pemasokan USING(id_pemasokan) JOIN user USING(id_user) JOIN toko USING (id_toko) GROUP BY nama,id_toko
+query terlaris minggu ini
+CREATE VIEW barang_terjual_minggu AS SELECT detail_penjualan.qty,nama,tanggal,kode,id_toko FROM detail_penjualan JOIN penjualan USING(id_penjualan) JOIN stok_barang USING(id_stok_b) JOIN barang_terdaftar USING (kode) JOIN user USING(id_user) JOIN toko USING(id_toko) WHERE tanggal BETWEEN SUBDATE(now(), INTERVAL 7 DAY) AND NOW()
+CREATE VIEW best_sell_minggu AS SELECT SUM(qty) AS jumlah_terjual,nama,id_toko FROM barang_terjual_minggu GROUP BY kode ORDER BY qty DESC
+query terlaris bulan ini
+CREATE VIEW barang_terjual_bulan AS SELECT detail_penjualan.qty,nama,tanggal,kode,id_toko FROM detail_penjualan JOIN penjualan USING(id_penjualan) JOIN stok_barang USING(id_stok_b) JOIN barang_terdaftar USING (kode) JOIN user USING(id_user) JOIN toko USING(id_toko) WHERE MONTH(tanggal) = MONTH(CURRENT_DATE())
+CREATE VIEW best_sell_bulan AS SELECT SUM(qty) AS jumlah_terjual,nama,id_toko FROM barang_terjual_minggu GROUP BY kode ORDER BY qty DESC
+
+
+SELECT COALESCE(SUM(total),0) as total_pengeluaran FROM pengeluaran_lain JOIN user USING(id_user) JOIN toko USING(id_toko) WHERE MONTH(tanggal) = 10 AND YEAR(NOW()) AND id_toko ='T1'
+SELECT COALESCE(SUM(total),0) as total_pemasokan FROM pemasokan JOIN user USING(id_user) JOIN toko USING(id_toko) WHERE MONTH(tanggal) = 10 AND YEAR(NOW()) AND id_toko ='T1'
+
+CREATE VIEW barang_terdaftar_semua AS
+SELECT bt.kode , bt.nama
+FROM barang_terdaftar bt;
+
+CREATE VIEW pemasokan_list AS
+SELECT p.id_pemasokan , p.tanggal , p.total , d.id_distributor ,d.nama , u.id_user ,u.nama_user , t.id_toko
+FROM pemasokan p JOIN user u using(id_user) JOIN distributor d using(id_distributor) JOIN toko t using(id_toko);
+
+CREATE VIEW pemasokan_list_detail AS
+SELECT p.id_pemasokan, bt.nama , sb.qty , sb.hrg_distributor , sb.total_hrg ,sb.kode_unik
+FROM stok_barang sb JOIN pemasokan p using(id_pemasokan) JOIN barang_terdaftar bt using(kode);
+
+CREATE VIEW stok_toko_lcc AS
+SELECT sb.id_stok_b, sb.kode_unik
+FROM stok_barang sb
+WHERE SUBSTR(sb.kode_unik, 1, 3) = 'LCC';
+
+CREATE VIEW stok_toko_cmc AS
+SELECT sb.id_stok_b, sb.kode_unik
+FROM stok_barang sb
+WHERE SUBSTR(sb.kode_unik, 1, 3) = 'CMC';
+
+CREATE VIEW stok_toko_pbl AS
+SELECT sb.id_stok_b, sb.kode_unik
+FROM stok_barang sb
+WHERE SUBSTR(sb.kode_unik, 1, 3) = 'PBL';
+
+CREATE VIEW barang_toko_barcode AS 
+
+SELECT * 
+
+FROM barang_kasir 
+
+WHERE (SUBSTR(kode_unik,1,3) = 'LCC' || SUBSTR(kode_unik,1,3) = 'CMC' || SUBSTR(kode_unik,1,3) = 'PBL') && qty > 0 ;
+
+
+
+PIVOT TABLE BUAT LAPORAN RAWAT JALAN
+SELECT  no_bp_p,
+	IF(no_bp_t = 'B002','Ya','Tidak')  AS Periksa
+FROM detail_bp_penanganan
+GROUP BY no_bp_p

@@ -1,0 +1,4 @@
+CREATE VIEW barang_garansi AS
+SELECT p.id_penjualan, t.id_toko , c.nama AS nama_customer , bt.nama AS nama_barang , p.tanggal , sb.kode_unik , DATEDIFF(NOW(),p.tanggal) AS garansi_berjalan
+FROM detail_penjualan dp JOIN stok_barang sb USING(id_stok_b) JOIN barang_terdaftar bt USING(kode) JOIN penjualan p USING(id_penjualan) JOIN customer c USING(id_customer) JOIN user u USING(id_user) JOIN toko t USING(id_toko)
+WHERE (SUBSTR(sb.kode_unik,1,3) != 'LCC' && SUBSTR(sb.kode_unik,1,3) != 'CMC' && SUBSTR(sb.kode_unik,1,3) != 'PBL');
